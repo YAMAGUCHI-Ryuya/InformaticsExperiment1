@@ -1,0 +1,119 @@
+// 各マスの調査
+            for (int y = 0; y < 9; y++) {
+                for (int x = 0; x < 9; x++) {
+                    if (board.cells[y][x].value != 0)//中身が確定していたら何もしない
+                        continue;
+                    //中身が確定していない場合
+                    int count = 0;//vが入る可能性の数
+                    int lastPossible = 0;
+                    for (int v = 1; v <= 9; v++) {
+                        if (board.cells[y][x].possible[v]) {
+                            count++;
+                            lastPossible = v;
+                        }
+                    }
+                    if (count == 0) {//解けない
+                        throw new Exception(
+                                "Error: No possible number at cell(" + x + "," + y + ")" + board.cells[y][x]);
+                    }
+                    if (count == 1) {//格納できる数が確定している場合
+                        board.cells[y][x].value = lastPossible;
+                        System.out.println("Fixed at (" + x + "," + y + ") => " + lastPossible);
+                        isUpdated = true;
+                    }
+                }
+            }
+
+            // 各行の調査
+            for (int y = 0; y < 9; y++) {
+                for (int v = 1; v <= 9; v++) {
+                    boolean isFixed = false;
+                    int count = 0;//vが入る可能性の数
+                    int lastPos = -1;
+                    for (int x = 0; x < 9; x++) {
+                        if (board.cells[y][x].value == v) {//その行にvが入っているか
+                            isFixed = true;
+                            break;
+                        }
+                        if (board.cells[y][x].possible[v]) {//そのマスにｖが入る可能性がある場合&その行にvが入る可能性
+                            count++;
+                            lastPos = x;
+                        }
+                    }
+                    if (isFixed)
+                        continue;
+                    if (count == 0) {//解けない
+                        throw new Exception("Error: No possible number " + v);
+                    }
+                    if (count == 1) {//格納できる数が確定している場合
+                        board.cells[y][lastPos].value = v;
+                        System.out.println("Fixed at (" + lastPos + "," + y + ") => " + v);
+                        isUpdated = true;
+                    }
+                }
+            }
+
+            // 各列の調査
+            for (int x = 0; x < 9; x++) {
+                for (int v = 1; v <= 9; v++) {
+                    boolean isFixed = false;
+                    int count = 0;//vが入る可能性の数
+                    int lastPos = -1;
+                    for (int y = 0; y < 9; y++) {
+                        if (board.cells[y][x].value == v) {//その列にvが入っているか
+                            isFixed = true;
+                            break;
+                        }
+                        if (board.cells[y][x].possible[v]) {//その列にvが入っていない&その列にvが入る可能性がある場合
+                            count++;
+                            lastPos = y;
+                        }
+                    }
+                    if (isFixed)
+                        continue;
+                    if (count == 0) {//解けない
+                        throw new Exception("Error: No possible number " + v);
+                    }
+                    if (count == 1) {//格納できる数が確定している場合
+                        board.cells[lastPos][x].value = v;
+                        System.out.println("Fixed at (" + x + "," + lastPos + ") => " + v);
+                        isUpdated = true;
+                    }
+                }
+            }
+
+            // 各ブロックの調査
+            for (int by = 0; by < 3; by++) {
+                for (int bx = 0; bx < 3; bx++) {
+                    Cell[] block = new Cell[9];
+                    for (int y = 0; y < 3; y++) {
+                        for (int x = 0; x < 3; x++) {
+                            block[y * 3 + x] = board.cells[by * 3 + y][bx * 3 + x];
+                        }
+                    }
+                    for (int v = 1; v <= 9; v++) {
+                        boolean isFixed = false;
+                        int count = 0;//vが入る可能性の数
+                        int lastPos = -1;
+                        for (int i = 0; i < 9; i++) {
+                            if (block[i].value == v) {//block[i]の値にvがあった場合
+                                isFixed = true;
+                                break;
+                            }
+                            if (block[i].possible[v]) {//block[i]の値にvがなかった場合&block[i]にvが入る可能性がある場合
+                                count++;
+                                lastPos = i;
+                            }
+                        }
+                        if (isFixed)
+                            continue;
+                        if (count == 0) {//解けない
+                            throw new Exception("Error: No possible number " + v);
+                        }
+                        if (count == 1) {//blockに入る値が確定した場合
+                            block[lastPos].value = v;
+                            System.out.println("Fixed at (" + block[lastPos].x + "," + block[lastPos].y + ") => " + v);
+                            isUpdated = true;
+                        }
+                    }
+                }

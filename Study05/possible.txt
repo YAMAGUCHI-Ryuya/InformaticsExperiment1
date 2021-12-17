@@ -1,0 +1,45 @@
+ // possible の更新
+            //行ごとに見る
+            for (int y = 0; y < 9; y++) {//行
+                boolean[] filter = new boolean[10];
+                for (int x = 0; x < 9; x++) {//列
+                    filter[board.cells[y][x].value] = true;
+                }
+                for (int x = 0; x < 9; x++) {
+                    for (int v = 1; v <= 9; v++) {
+                        board.cells[y][x].possible[v] = board.cells[y][x].possible[v] & !filter[v];//その行に使える数字の可能性を探す
+                    }
+                }
+            }
+            //列ごとに見る
+            for (int x = 0; x < 9; x++) {
+                boolean[] filter = new boolean[10];
+                for (int y = 0; y < 9; y++) {
+                    filter[board.cells[y][x].value] = true;
+                }
+                for (int y = 0; y < 9; y++) {
+                    for (int v = 1; v <= 9; v++) {
+                        board.cells[y][x].possible[v] = board.cells[y][x].possible[v] & !filter[v];//その列に使える数字の可能性を探す
+                    }
+                }
+            }
+            //Blockごとに見る
+            for (int by = 0; by < 3; by++) {
+                for (int bx = 0; bx < 3; bx++) {
+                    Cell[] block = new Cell[9];
+                    for (int y = 0; y < 3; y++) {
+                        for (int x = 0; x < 3; x++) {
+                            block[y * 3 + x] = board.cells[by * 3 + y][bx * 3 + x];
+                        }
+                    }
+                    boolean[] filter = new boolean[10];
+                    for (int i = 0; i < 9; i++) {
+                        filter[block[i].value] = true;
+                    }
+                    for (int i = 0; i < 9; i++) {
+                        for (int v = 1; v <= 9; v++) {
+                            block[i].possible[v] = block[i].possible[v] & !filter[v];//block[i]の中にpossible[i]が入る可能性
+                        }
+                    }
+                }
+            }
